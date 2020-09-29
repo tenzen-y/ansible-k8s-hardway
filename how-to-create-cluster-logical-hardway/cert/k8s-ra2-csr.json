@@ -1,0 +1,16 @@
+{
+  "CN": "system:node:k8s-ra2",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "JP",
+      "L": "Setagaya",
+      "O": "system:nodes",
+      "OU": "Kubernetes The Hard Way",
+      "ST": "Tokyo"
+    }
+  ]
+}

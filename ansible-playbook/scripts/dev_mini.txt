@@ -1,0 +1,16 @@
+# sample setting file for dev env
+
+# env to deploy, 'dev' or 'prod'.
+STAGE=dev
+# set 'big' or 'mini'.
+HOSTS_TYPE=mini
+# ssh config file full path on client.
+SSH_CONFIG_PATH=$HOME/.ssh/config
+# ssh public key full path on client.
+SSH_PUBLICKEY_PATH=$HOME/.ssh/id_rsa.pub
+# all remote pass
+REMOTE_HOST_PASS=a
+# ceph type, 'cephfs' or 'rbd'
+CEPH_TYPE=cephfs
+# set vip to use kube-apiserver.
+KUBE_API_VIP=192.168.1.140

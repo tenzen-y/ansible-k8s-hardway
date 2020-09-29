@@ -1,0 +1,8 @@
+all:
+  hosts:
+    ra1:
+      ansible_ssh_user: ubuntu
+    ra2:
+      ansible_ssh_user: ubuntu
+    ra3:
+      ansible_ssh_user: ubuntu

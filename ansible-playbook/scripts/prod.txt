@@ -1,0 +1,14 @@
+# sample setting file for prod env.
+
+# env to deploy, 'dev' or 'prod'.
+STAGE=prod
+# set 'inside' or 'outside'.
+HOSTS_TYPE=inside
+# ssh config file full path on client.
+SSH_CONFIG_PATH=$HOME/.ssh/config
+# ssh public key full path on client.
+SSH_PUBLICKEY_PATH=$HOME/.ssh/id_rsa.pub
+# all remote pass
+REMOTE_HOST_PASS=a
+# ceph type, 'cephfs' or 'rbd'
+CEPH_TYPE=cephfs

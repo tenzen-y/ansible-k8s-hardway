@@ -1,0 +1,5 @@
+ingress_nginx_loadbalancers:
+  - name: jupyter-lab
+    lb_address: 192.168.1.210
+  - name: argo-cd
+    lb_address: 192.168.1.211

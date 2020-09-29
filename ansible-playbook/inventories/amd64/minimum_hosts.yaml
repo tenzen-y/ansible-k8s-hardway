@@ -1,0 +1,55 @@
+all:
+  hosts:
+    vm-w3:
+      ansible_ssh_user: vm-w3
+    vm-w4:
+      ansible_ssh_user: vm-w4
+    vm-w5:
+      ansible_ssh_user: vm-w5
+  vars:
+    constitution: minimum      
+  children:
+    controlPlaneNodes:
+      children:
+        masterGroup:      
+          hosts:
+            vm-w3:
+        backupGroup:
+          hosts:
+            vm-w4:          
+            vm-w5:
+    topolvmClusterNodes:
+      hosts:
+        vm-w3:
+        vm-w4:
+        vm-w5:
+    deployerGroup:
+      hosts:
+        vm-w3:
+        vm-w4:
+        vm-w5:
+    Nodes:
+      hosts:
+        vm-w3:
+        vm-w4:
+        vm-w5:
+    nodeLabels:
+      children:
+        rook_rack:
+          children:
+            nakiri:
+              hosts:
+                vm-w3:
+            sasaki:
+              hosts:    
+                vm-w4:
+            yorumi:  
+              hosts:      
+                vm-w5:
+        hardware_type:
+          children:
+            NonGPU:
+              hosts:
+                vm-w3:
+                vm-w4:
+                vm-w5:

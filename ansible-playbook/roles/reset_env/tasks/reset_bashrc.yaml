@@ -1,0 +1,19 @@
+- name: reset /etc/bash_completion.d/kubectl
+  become: true
+  file:
+    state: absent
+    path: "/etc/bash_completion.d/kubectl"
+
+- name: rm $HOME/.bashrc
+  file:
+    state: absent
+    path: "$HOME/.bashrc"
+
+- name: check existence of $HOME/.bashrc.bak
+  stat:
+    path: "$HOME/.bashrc.bak"
+  register: bashrc_bak_status
+
+- name: mv $HOME/.bashrc.bak to $HOME/.bashrc
+  shell: "mv $HOME/.bashrc.bak $HOME/.bashrc"
+  when: bashrc_bak_status.stat.exists==true

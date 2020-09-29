@@ -1,0 +1,12 @@
+- name: uninstall kustomize
+  become: true
+  file:
+    state: absent
+    path: "/usr/local/bin/kustomize"
+
+- name: uninstall helm3
+  become: true
+  apt:
+    state: absent
+    purge: true
+    name: helm

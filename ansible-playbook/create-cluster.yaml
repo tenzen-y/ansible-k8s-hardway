@@ -1,0 +1,6 @@
+---
+- import_playbook: "all.yaml"
+- import_playbook: "topolvmClusterNodes.yaml"
+  when: stage=='dev'
+- import_playbook: "k8sClusterNodes.yaml"
+- import_playbook: "deployer.yaml"
