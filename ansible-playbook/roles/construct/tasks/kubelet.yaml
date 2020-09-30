@@ -60,9 +60,9 @@
 - name: copy cert for kubelet /var/lib/kubelet
   become: true
   synchronize:
-    src: "{{ home_dir }}/cert/{{ inventory_hostname }}.kubeconfig"
+    src: "{{ home_dir }}/kubeconfig/{{ inventory_hostname }}.kubeconfig"
     dest: "/var/lib/kubelet/kubeconfig"
-  delegate_to: "{{ inventory_hostname }}"  
+  delegate_to: "{{ inventory_hostname }}"
   
 - name: copy config.toml /etc/containerd/
   become: true

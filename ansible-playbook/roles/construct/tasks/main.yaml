@@ -1,12 +1,12 @@
 ---
-- import_tasks: initialize.yaml
-- import_tasks: set_certification.yaml
-- import_tasks: etcd.yaml
-- import_tasks: keepalived.yaml
-- import_tasks: nginx.yaml
-- import_tasks: kube-apiserver.yaml
-- import_tasks: kube-controller-manager.yaml
-- import_tasks: kube-scheduler.yaml
+# - import_tasks: initialize.yaml
+# - import_tasks: set_certification.yaml
+# - import_tasks: etcd.yaml
+# - import_tasks: keepalived.yaml
+# - import_tasks: nginx.yaml
+# - import_tasks: kube-apiserver.yaml
+# - import_tasks: kube-controller-manager.yaml
+# - import_tasks: kube-scheduler.yaml
 - import_tasks: kubelet.yaml
 - import_tasks: addon.yaml
   vars:
