@@ -1,8 +1,11 @@
 - name: make /var/lib/kube-proxy
   become: true
   file:
-    path: /var/lib/kube-proxy
+    path: "{{ item }}"
     state: directory
+  with_items:
+    - /var/lib/kube-proxy
+    - /lib/modules
 
 - name: copy the kubeconfig for kube-proxy
   become: true
@@ -14,7 +17,9 @@
 - name:  make kube-proxy manifest
   template: 
     src: "../templates/kube-proxy.yaml.j2"
-    dest: "$HOME/addon/kube-proxy.yaml"
+    dest: "$$HOME/K8s_manifest/kube-proxy.yaml"
 
-- name:     
+- name: kubectl apply -f "$HOME/K8s_manifest/kube-proxy.yaml"
+  run_once: true
+  shell: "kubectl apply -f $HOME/K8s_manifest/kube-proxy.yaml"
 

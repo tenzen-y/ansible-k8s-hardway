@@ -1,11 +1,24 @@
+- name: copy netplan file
+  become: true
+  template:
+    src: "../templates/99-cloud-init.yaml.j2"
+    dest: "/etc/netplan"
+
 - name: change hostname
   become: true
   shell: |
-    hostnamectl set-hostname "{{ inventory_hostname }}"
-
+    if [ `uname -n` != "{{ inventory_hostname }}" ];then
+      hostnamectl set-hostname "{{ inventory_hostname }}"
+      echo true
+    else
+      echo false
+    fi
+  register: hostname_change_flag
+    
 - name: reboot
   become: true
   reboot: 
+  when: hostname_change_flag.stdout_lines[0] == "true"
 
 - name: apt update & apt upgrade
   become: true
@@ -32,7 +45,27 @@
     - https://storage.googleapis.com/kubernetes-release/release/v{{ K8s_version }}/bin/linux/arm64/kubectl
     - https://storage.googleapis.com/kubernetes-release/release/v{{ K8s_version }}/bin/linux/arm64/kubelet
 
-- name: copy addon
+- name: mv kubectl, kubelet
+  become: true
+  file:
+    path: "{{ item }}"
+    mode: "0755"
+  with_items: 
+    - kubectl
+    - kubelet
+      
+- name: copy kubectl, kubelet to /usr/local/bin
+  become: true
+  synchronize: 
+    src: "{{ home_dir }}/{{ item }}"
+    dest: "/usr/local/bin"
+  with_items:
+    - kubectl
+    - kubelet
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: copy some addon manifests
   copy:
-    src: "../files/adddon"
-    dest: "$HOME"
+    src: "../files/addon/"
+    dest: "$HOME/K8s_manifest/"
+

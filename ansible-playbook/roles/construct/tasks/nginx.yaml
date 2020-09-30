@@ -12,13 +12,13 @@
 
 - name: make /etc/nginx/kube-apiserver.conf 
   become: true
-  templates:
-    src: "../templates/static_pods/kube-apiserver.conf"
-    dest: "/etc/nginx"
+  template:
+    src: "../templates/nginx/kube-apiserver.conf.j2"
+    dest: "/etc/nginx/kube-apiserver.conf"
 
 - name: copy nginx manifests
   become: true
   copy:
-    src: "../files/nginx.yaml"
+    src: "../files/static_pods/nginx.yaml"
     dest: "/etc/kubelet.d"
 

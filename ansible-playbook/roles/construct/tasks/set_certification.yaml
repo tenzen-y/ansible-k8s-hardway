@@ -1,28 +1,3 @@
-- name: apt update & apt upgrade
-  become: true
-  apt:
-    autoclean: yes
-    upgrade: safe
-    update_cache: yes
-    state: latest   
-
-- name: install golang-cfssl
-  run_once: true
-  become: true
-  apt: 
-    update_cache: yes
-    name: 
-    - golang-cfssl
-
-- name: download kubectl, kubelet
-  get_url:
-    url: "{{ item }}"
-    dest: $HOME
-    mode: "0755"
-  with_items:
-    - https://storage.googleapis.com/kubernetes-release/release/v{{ K8s_version }}/bin/linux/arm64/kubectl
-    - https://storage.googleapis.com/kubernetes-release/release/v{{ K8s_version }}/bin/linux/arm64/kubelet
-
 - name: make generate-cert.sh
   run_once: true
   template:
@@ -85,7 +60,7 @@
 - name: delivery some cert files
   copy:
     src: ../files/cert
-    dest: $HOME/cert
+    dest: $HOME
   when: not existance_generate_cert.stat.exists  
 
 - name: remove roles/construct/files/cert
@@ -136,3 +111,17 @@
   file:
     path: "/etc/kubelet.d"
     state: directory
+
+- name: mkdir -p $HOME/.kube
+  file: 
+    path: "${HOME}/.kube"
+    state: "directory"
+    owner: "{{ ansible_effective_user_id }}"
+    group: "{{ ansible_effective_group_id }}" 
+
+- name: copy kubeconfig/admin.kubeconfig to $HOME/.kube/config in remote host
+  synchronize:
+    src: "{{ home_dir }}/kubeconfig/admin.kubeconfig"
+    dest: "{{ home_dir }}/.kube/config"
+  delegate_to: "{{ inventory_hostname }}"
+      

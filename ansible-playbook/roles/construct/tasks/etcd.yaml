@@ -36,3 +36,4 @@
   template:
     src: ../templates/static_pods/etcd.yaml.j2
     dest: /etc/kubelet.d/etcd.yaml
+    

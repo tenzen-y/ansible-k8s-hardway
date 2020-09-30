@@ -5,7 +5,7 @@
     dest: /var/lib/kubernetes
   delegate_to: "{{ inventory_hostname }}"
 
-- name: make the manifest for kube-schedule
+- name: make the manifest for kube-scheduler
   become: true
   template:
     src: "../templates/static_pods/kube-scheduler.yaml.j2"

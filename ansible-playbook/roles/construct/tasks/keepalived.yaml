@@ -20,5 +20,5 @@
 - name: create keepalived.yaml
   become: true
   copy:
-    src: "../../files/static_pods/keepalived.yaml"
+    src: "../files/static_pods/keepalived.yaml"
     dest: "/etc/kubelet.d"
