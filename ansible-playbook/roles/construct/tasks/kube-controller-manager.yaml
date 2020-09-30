@@ -2,6 +2,7 @@
   become: true
   file:
     path: "{{ item }}"
+    state: directory
   with_items:
     - /usr/libexec/kubernetes/kubelet-plugins/volume/exec
 

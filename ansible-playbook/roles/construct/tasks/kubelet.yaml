@@ -7,6 +7,7 @@
     - /etc/cni/net.d
     - /opt/cni/bin
     - /var/lib/kubelet
+    - /var/lib/kubernetes
     - /etc/containerd
 
 - name: copy containerd config
@@ -46,7 +47,22 @@
   with_items:
     - "{{ inventory_hostname }}-key.pem"
     - "{{ inventory_hostname }}.pem"
+    - "ca.pem"
   delegate_to: "{{ inventory_hostname }}"
+
+- name: copy cert for kubelet /var/lib/kubernetes
+  become: true
+  synchronize:
+    src: "{{ home_dir }}/cert/ca.pem"
+    dest: "/var/lib/kubernetes"
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: copy cert for kubelet /var/lib/kubelet
+  become: true
+  synchronize:
+    src: "{{ home_dir }}/cert/{{ inventory_hostname }}.kubeconfig"
+    dest: "/var/lib/kubelet/kubeconfig"
+  delegate_to: "{{ inventory_hostname }}"  
   
 - name: copy config.toml /etc/containerd/
   become: true
@@ -55,9 +71,10 @@
     dest: "/etc/containerd/config.toml"
 
 - name: make kubelet-config.yaml
+  become: true
   template:
     src: "../templates/kubelet-config.yaml.j2"
-    dest: "/var/lib/kubelet"
+    dest: "/var/lib/kubelet/kubelet-config.yaml"
   
 - name: copy kubelet.service
   copy:
