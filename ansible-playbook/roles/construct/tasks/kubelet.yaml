@@ -63,7 +63,7 @@
     src: "{{ home_dir }}/cert/{{ inventory_hostname }}.kubeconfig"
     dest: "/var/lib/kubelet/kubeconfig"
   delegate_to: "{{ inventory_hostname }}"  
-
+  
 - name: copy config.toml /etc/containerd/
   become: true
   copy:
@@ -77,7 +77,6 @@
     dest: "/var/lib/kubelet/kubelet-config.yaml"
   
 - name: copy kubelet.service
-  become: true
   copy:
     src: "../files/kubelet.service"
     dest: "/etc/systemd/system/kubelet.service"
