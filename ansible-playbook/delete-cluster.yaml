@@ -1,5 +1,0 @@
----
-- import_playbook: "app_breaker.yaml"
-- import_playbook: "worker_breaker.yaml"
-  when: constitution=="redundant"
-- import_playbook: "breaker.yaml"

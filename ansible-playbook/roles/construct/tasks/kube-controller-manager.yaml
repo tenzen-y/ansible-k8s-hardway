@@ -1,0 +1,20 @@
+- name: make dir for mount
+  become: true
+  file:
+    path: "{{ item }}"
+  with_items:
+    - /usr/libexec/kubernetes/kubelet-plugins/volume/exec
+
+- name: copy cert for kube-controller-manager
+  become: true
+  synchronize:
+    src: "{{ home_dir }}/kubeconfig/kube-controller-manager.kubeconfig"
+    dest: "/var/lib/kubernetes"
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: make kube-controller-manager manifests
+  become: true
+  template:
+    src: "../templates/static_pods/kube-controller-manager.yaml.j2"
+    dest: "/etc/kubelet.d/kube-controller-manager.yaml"
+  

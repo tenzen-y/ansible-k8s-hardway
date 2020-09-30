@@ -1,0 +1,39 @@
+- name: mkdir /var/lib/etcd
+  become: true
+  file:
+    path: /var/lib/etcd
+    state: directory
+
+- name: make dir for etcd
+  become: true
+  file:
+    state: directory
+    path: "{{ item }}"
+  with_items:
+    - /var/lib/etcd
+    - /etc/etcd
+
+- name: change mode in /var/lib/etcd
+  become: true
+  file:
+    state: directory
+    path: /var/lib/etcd
+    mode: 700
+
+- name: copy cert for etcd
+  become: true
+  synchronize:
+    src: "{{ home_dir }}/cert/{{ item }}"
+    dest: "/etc/etcd/"
+  with_items:
+    - ca.pem 
+    - kubernetes-key.pem
+    - kubernetes.pem
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: make etcd manifests
+  become: true
+  template:
+    src: ../templates/static_pods/etcd.yaml.j2
+    dest: /etc/kubelet.d/etcd.yaml
+    

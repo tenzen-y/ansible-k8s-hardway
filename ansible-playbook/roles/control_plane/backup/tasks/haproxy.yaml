@@ -1,5 +1,0 @@
-- name: create haproxy.yaml
-  become: true
-  copy:
-    dest: "/etc/kubernetes/manifests/haproxy.yaml"
-    src: "../../files/haproxy.yaml"

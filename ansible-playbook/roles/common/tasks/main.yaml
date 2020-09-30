@@ -1,6 +1,0 @@
----
-- import_tasks: "initialize.yaml"
-- import_tasks: "adjust_time.yaml"
-- import_tasks: "set_bashrc.yaml"
-- import_tasks: "install_docker.yaml"
-- import_tasks: "install_kubernetes.yaml"

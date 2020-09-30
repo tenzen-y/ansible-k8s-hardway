@@ -1,0 +1,13 @@
+- name: copy the kubeconfig for kube-scheduler
+  become: true
+  synchronize:
+    src: "{{ home_dir }}/kubeconfig/kube-scheduler.kubeconfig"
+    dest: /var/lib/kubernetes
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: make the manifest for kube-scheduler
+  become: true
+  template:
+    src: "../templates/static_pods/kube-scheduler.yaml.j2"
+    dest: "/etc/kubelet.d/kube-scheduler.yaml"
+

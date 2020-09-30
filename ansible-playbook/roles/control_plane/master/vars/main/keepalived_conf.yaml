@@ -1,3 +1,0 @@
-keepalived_master:
-  STATE: "MASTER"
-  PRIORITY: "101"

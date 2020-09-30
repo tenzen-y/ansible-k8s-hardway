@@ -1,0 +1,33 @@
+- name: make mount dir
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - /usr/share/ca-certificates
+    - /usr/local/share/ca-certificates
+    - /etc/pki
+    - /etc/ca-certificates
+    - /etc/ssl/certs
+    - /etc/kubernetes/config
+
+- name: copy the cert files for kube-apiserver
+  become: true
+  synchronize:
+    src: "{{ home_dir }}/cert/{{ item }}"
+    dest: /var/lib/kubernetes
+  with_items:
+    - ca.pem 
+    - ca-key.pem 
+    - kubernetes-key.pem 
+    - kubernetes.pem
+    - service-account-key.pem 
+    - service-account.pem
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: make kube-apiserver manifests
+  become: true
+  template:
+    src: "../templates/static_pods/kube-apiserver.yaml.j2"
+    dest: "/etc/kubelet.d/kube-apiserver.yaml"
+    
