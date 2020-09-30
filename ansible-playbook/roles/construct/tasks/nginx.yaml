@@ -1,0 +1,24 @@
+- name: mkdir /etc/nginx
+  become: true
+  file:
+    path: "/etc/nginx"
+    state: directory
+
+- name: copy conf for nginx
+  become: true
+  copy:
+    src: "../files/static_pods/nginx.conf"
+    dest: "/etc/nginx"
+
+- name: make /etc/nginx/kube-apiserver.conf 
+  become: true
+  templates:
+    src: "../templates/static_pods/kube-apiserver.conf"
+    dest: "/etc/nginx"
+
+- name: copy nginx manifests
+  become: true
+  copy:
+    src: "../files/nginx.yaml"
+    dest: "/etc/kubelet.d"
+

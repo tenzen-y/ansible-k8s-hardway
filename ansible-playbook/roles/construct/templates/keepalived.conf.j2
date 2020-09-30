@@ -1,0 +1,27 @@
+global_defs {
+    router_id LVS_DEVEL
+}
+vrrp_script check_apiserver {
+  script "/etc/keepalived/check_apiserver.sh"
+  interval 3
+  weight -2
+  fall 10
+  rise 2
+}
+
+vrrp_instance VI_1 {
+    state BACKUP
+    interface {{ ansible_default_ipv4.interface }}
+    virtual_router_id {{ keepalived_configuration.ROUTER_ID }}
+    priority 100
+    authentication {
+        auth_type PASS
+        auth_pass {{ keepalived_configuration.AUTH_PASS }}
+    }
+    virtual_ipaddress {
+        {{ apiserver_vip }}
+    }
+    track_script {
+        check_apiserver
+    }
+}

@@ -1,0 +1,20 @@
+- name: make /var/lib/kube-proxy
+  become: true
+  file:
+    path: /var/lib/kube-proxy
+    state: directory
+
+- name: copy the kubeconfig for kube-proxy
+  become: true
+  synchronize:
+    src: "{{ home_dir }}/kubeconfig/kube-proxy.kubeconfig"  
+    dest: "/var/lib/kube-proxy.kubeconfig"
+  delegate_to: "{{ inventory_hostname }}"
+
+- name:  make kube-proxy manifest
+  template: 
+    src: "../templates/kube-proxy.yaml.j2"
+    dest: "$HOME/addon/kube-proxy.yaml"
+
+- name:     
+

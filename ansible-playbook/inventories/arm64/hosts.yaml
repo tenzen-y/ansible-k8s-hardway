@@ -1,8 +1,8 @@
 all:
   hosts:
-    ra1:
+    k8s-ra1:
       ansible_ssh_user: ubuntu
-    ra2:
+    k8s-ra2:
       ansible_ssh_user: ubuntu
-    ra3:
+    k8s-ra3:
       ansible_ssh_user: ubuntu

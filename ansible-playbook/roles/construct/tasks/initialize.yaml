@@ -1,0 +1,38 @@
+- name: change hostname
+  become: true
+  shell: |
+    hostnamectl set-hostname "{{ inventory_hostname }}"
+
+- name: reboot
+  become: true
+  reboot: 
+
+- name: apt update & apt upgrade
+  become: true
+  apt:
+    autoclean: yes
+    upgrade: safe
+    update_cache: yes
+    state: latest   
+
+- name: install golang-cfssl
+  run_once: true
+  become: true
+  apt: 
+    update_cache: yes
+    name: 
+    - golang-cfssl
+
+- name: download kubectl, kubelet
+  get_url:
+    url: "{{ item }}"
+    dest: $HOME
+    mode: "0755"
+  with_items:
+    - https://storage.googleapis.com/kubernetes-release/release/v{{ K8s_version }}/bin/linux/arm64/kubectl
+    - https://storage.googleapis.com/kubernetes-release/release/v{{ K8s_version }}/bin/linux/arm64/kubelet
+
+- name: copy addon
+  copy:
+    src: "../files/adddon"
+    dest: "$HOME"

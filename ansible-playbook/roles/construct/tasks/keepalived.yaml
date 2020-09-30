@@ -1,0 +1,24 @@
+- name: mkdir "/etc/keepalived"
+  become: true
+  file: 
+    path: "/etc/keepalived"
+    state: "directory"
+
+- name: set check_apiserver.sh for keepalived
+  become: true
+  template:
+    src: "../templates/check_apiserver.sh.j2"
+    dest: "/etc/keepalived/check_apiserver.sh"
+    mode: "0744"
+
+- name: set keepalived config
+  become: true
+  template:
+    src: "../templates/keepalived.conf.j2"
+    dest: "/etc/keepalived/keepalived.conf"
+
+- name: create keepalived.yaml
+  become: true
+  copy:
+    src: "../../files/static_pods/keepalived.yaml"
+    dest: "/etc/kubelet.d"

@@ -1,0 +1,11 @@
+upstream stream_backend {
+    least_conn;
+{% for host in groups['all'] %}
+    server {{ hostvars[host]['ansible_default_ipv4']['address'] }}:6444;
+{% endfor %} 
+}
+
+server {
+    listen        6443;
+    proxy_pass    stream_backend;
+}

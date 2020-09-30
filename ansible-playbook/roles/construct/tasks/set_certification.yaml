@@ -1,0 +1,138 @@
+- name: apt update & apt upgrade
+  become: true
+  apt:
+    autoclean: yes
+    upgrade: safe
+    update_cache: yes
+    state: latest   
+
+- name: install golang-cfssl
+  run_once: true
+  become: true
+  apt: 
+    update_cache: yes
+    name: 
+    - golang-cfssl
+
+- name: download kubectl, kubelet
+  get_url:
+    url: "{{ item }}"
+    dest: $HOME
+    mode: "0755"
+  with_items:
+    - https://storage.googleapis.com/kubernetes-release/release/v{{ K8s_version }}/bin/linux/arm64/kubectl
+    - https://storage.googleapis.com/kubernetes-release/release/v{{ K8s_version }}/bin/linux/arm64/kubelet
+
+- name: make generate-cert.sh
+  run_once: true
+  template:
+    src: ../templates/generate-cert.sh.j2
+    dest: $HOME/generate-cert.sh
+    mode: "0755"
+
+- name: check generate-cert.sh
+  stat:
+    path: $HOME/generate-cert.sh
+  register: existance_generate_cert
+
+- name: make generate-kubeconfig.sh    
+  run_once: true
+  template:
+    src: ../templates/generate-kubeconfig.sh.j2
+    dest: $HOME/generate-kubeconfig.sh
+    mode: "0755"
+  when: existance_generate_cert.stat.exists
+
+- name: run generate-cert.sh, generate-kubeconfig.sh
+  run_once: true
+  shell: |
+    ./generate-cert.sh    
+    ./generate-kubeconfig.sh
+  when: existance_generate_cert.stat.exists
+
+- name: set hostname in /etc/hosts
+  become: true
+  blockinfile:
+    path: /etc/hosts
+    block: |
+      {% for host in groups['all'] %}
+      {{ hostvars[host]['inventory_hostname'] }} {{ hostvars[host]['ansible_default_ipv4']['address'] }}
+      {% endfor -%}
+
+- name: find some files in $HOME/cert
+  find:
+    paths: "$HOME/cert/"
+    patterns: "*"
+  register: files_in_cert
+  when: existance_generate_cert.stat.exists
+
+- name: copy cert to localhost
+  run_once: true
+  fetch:
+    src: "{{ item.path }}"
+    dest: "roles/construct/files/cert/"
+    flat: true
+  with_items: "{{ files_in_cert.files }}"
+  when: existance_generate_cert.stat.exists
+
+- name: make roles/construct/files/cert
+  run_once: true
+  file:
+    path: "roles/construct/files/cert"
+    state: directory
+  delegate_to: localhost
+
+- name: delivery some cert files
+  copy:
+    src: ../files/cert
+    dest: $HOME/cert
+  when: not existance_generate_cert.stat.exists  
+
+- name: remove roles/construct/files/cert
+  run_once: true
+  file:
+    path: "roles/construct/files/cert"
+    state: absent
+  delegate_to: localhost
+
+- name: find some files in $HOME/kubeconfig
+  find:
+    paths: "$HOME/kubeconfig/"
+    patterns: "*"
+  register: files_in_kubeconfig
+  when: existance_generate_cert.stat.exists
+
+- name: copy kubeconfig to localhost
+  run_once: true
+  fetch:
+    src: "{{ item.path }}"
+    dest: "roles/construct/files/kubeconfig/"
+    flat: true
+  with_items: "{{ files_in_kubeconfig.files }}"
+  when: existance_generate_cert.stat.exists
+
+- name: make roles/construct/files/kubeconfig
+  run_once: true
+  file:
+    path: "roles/construct/files/kubeconfig"
+    state: directory
+  delegate_to: localhost
+
+- name: delivery some kubeconfig files
+  copy:
+    src: ../files/kubeconfig
+    dest: $HOME
+  when: not existance_generate_cert.stat.exists 
+
+- name: remove roles/construct/files/kubeconfig
+  run_once: true
+  file:
+    path: "roles/construct/files/kubeconfig"
+    state: absent
+  delegate_to: localhost
+
+- name: make dir for the static pods
+  become: true
+  file:
+    path: "/etc/kubelet.d"
+    state: directory

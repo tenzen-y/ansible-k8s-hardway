@@ -1,0 +1,54 @@
+- name: waiting for start first {{ POD_LABEL }} pods...
+  shell: |
+    STATUS="bad"
+    POD_NAME=`kubectl get pod -n {{ NAME_SPACE }} -l {{ POD_LABEL }} -ojsonpath='{.items[*].metadata.name}'`
+
+    if [ -n "$POD_NAME" ];then
+      STATUS="ok"
+    fi
+
+    echo $STATUS
+  register: first_pod_status
+  retries: 50
+  delay: 5
+  until: first_pod_status.stdout_lines[0]=='ok'
+  ignore_errors: true
+
+- name: get resources
+  shell: |
+    kubectl get pods -n {{ NAME_SPACE }} -owide
+  register: show_pods
+  ignore_errors: true
+
+- name: show pods in {{ NAME_SPACE }}
+  debug:
+    msg: "{{ show_pods.stdout }}"
+  ignore_errors: true  
+
+- name: waiting for start {{ POD_LABEL }} pods...
+  shell: |
+    STATUS="bad"
+    POD_NAME=`kubectl get po -n {{ NAME_SPACE }} -l {{ POD_LABEL }} \
+                --field-selector status.phase!=Running -o jsonpath='{.items[*].metadata.name}'`
+
+    if [ -z "$POD_NAME" ];then
+      STATUS="ok"
+    fi
+
+    echo $STATUS
+  register: pods_status
+  retries: 50
+  delay: 5
+  until: pods_status.stdout_lines[0]=='ok'
+  ignore_errors: true
+
+- name: get resources
+  shell: |
+    kubectl get pods -n {{ NAME_SPACE }} -owide
+  register: show_pods
+  ignore_errors: true
+
+- name: show pods in {{ NAME_SPACE }}
+  debug:
+    msg: "{{ show_pods.stdout }}"  
+  ignore_errors: true

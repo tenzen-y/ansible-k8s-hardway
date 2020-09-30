@@ -1,4 +1,0 @@
-- name: ufw reset
-  become: true
-  ufw:
-    state: reset

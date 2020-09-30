@@ -1,0 +1,63 @@
+- name: make the dir for kubelet
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items: 
+    - /etc/cni/net.d
+    - /opt/cni/bin
+    - /var/lib/kubelet
+    - /etc/containerd
+
+- name: install containerd, runc
+  become: true
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - containerd
+    - runc
+
+- name: download crictl
+  get_url:
+    url: https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.18.0/crictl-v1.18.0-linux-arm64.tar.gz
+    dest: $HOME
+    mode: "0755"
+
+- name: copy cert for kubelet
+  become: true
+  synchronize:
+    src: "{{ home_dir }}/cert/{{ item }}"
+    dest: "/var/lib/kubelet"
+  with_items:
+    - "{{ inventory_hostname }}-key.pem"
+    - "{{ inventory_hostname }}.pem"
+
+- name: copy config.toml /etc/containerd/
+  become: true
+  copy:
+    src: "../files/config.toml"    
+    dest: "/etc/containerd/config.toml"
+
+- name: make kubelet-config.yaml
+  template:
+    src: "../templates/kubelet-config.yaml.j2"
+    dest: "/var/lib/kubelet"
+  
+- name: copy kubelet.service
+  copy:
+    src: "../files/kubelet.service"
+    dest: "/etc/systemd/system/kubelet.service"
+  
+- name: start daemon by systemd
+  become: true
+  systemd:
+    daemon_reload: true
+    enabled: true
+    state: started
+    name: "{{ item }}"
+  with_items:
+    - containerd
+    - kubelet
+
+
+    

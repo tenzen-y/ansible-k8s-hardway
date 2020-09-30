@@ -1,0 +1,42 @@
+- name: deploy calico
+  run_once: true
+  shell: "kubectl apply -f $HOME/K8s_manifest/calico/calico.yaml"
+
+- name: pause 3sec
+  pause:
+    seconds: "3"  
+
+- name: waiting for start calico-kube-controllers pod...
+  run_once: true
+  vars:
+    - POD_LABEL: "k8s-app=calico-kube-controllers"
+  import_tasks: wait_running.yaml
+
+- name: waiting for start calico-node pod...
+  run_once: true
+  vars:
+    POD_LABEL: "k8s-app=calico-node"
+  import_tasks: wait_running.yaml
+
+- name: waiting for start k8s-app=kube-dns pod...
+  run_once: true
+  vars:
+    POD_LABEL: "k8s-app=kube-dns"
+  import_tasks: wait_running.yaml
+
+- name: deploy calicoctl
+  run_once: true
+  shell: "kubectl apply -f $HOME/K8s_manifest/calico/calicoctl.yaml"
+
+- name: pause 3sec
+  pause:
+    seconds: "3"
+
+- name: waiting for start calicoctl pod...
+  run_once: true
+  vars:
+    - POD_LABEL: "k8s-app=calicoctl"
+  import_tasks: wait_running.yaml
+
+- name: deploy coredns
+  run_once: true
